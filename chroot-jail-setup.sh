@@ -81,19 +81,22 @@ if [ ! -d "/jail/home/prisoner" ]; then
 fi
 mkdir /jail/home/prisoner/.ssh
 touch /jail/home/prisoner/.ssh/authorized_keys
-cat $(ls $HOME/.ssh/*.pub) > /jail/home/prisoner/.ssh/authorized_keys
+#since the script needs to be run as root, the HOME variable will always return /root,
+#which probably isn't where your ssh public keys are. so ask where to look:
+read -p 'Home directory to source ssh keys to authorize (ex. /home/user): ' homedir
+cat $(ls $homedir/.ssh/*.pub) > /jail/home/prisoner/.ssh/authorized_keys
 authorized="$?"
 if [ "$authorized" == 1 ]; then
-    echo "Warning: no public keys found in $HOME/.ssh to add to authorized login keys for prisoner"
+    echo "Warning: no public keys found in $homedir/.ssh to add to authorized login keys for prisoner"
 else
-    echo "Authorized pubkeys from $HOME/.ssh for login"
+    echo "Authorized pubkeys from $homedir/.ssh for login"
 fi
 chmod 600 /jail/home/prisoner/.ssh/authorized_keys
 chown prisoner:prisoner /jail/home/prisoner/.ssh
 chown prisoner:prisoner /jail/home/prisoner/.ssh/authorized_keys
 yn=0
 while [ $yn -lt 1 ]; do
-       read -p "Set a password for prisoner? (y or n)" yorn
+       read -p "Set a password for prisoner? (y or n) " yorn
        case $yorn in
        y)      echo "Setting password for prisoner"
                passwd prisoner
