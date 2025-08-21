@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+#I build a little script out of.... some crazy garbage
+
 if [ "$(echo $EUID)" -ne "0" ]; then
     echo "Run it as root"
     exit 1
